@@ -1,0 +1,45 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id               String           @id @default(uuid())
+  username         String
+  email            String
+  password         String
+  createdAt        DateTime         @default(now())
+  updatedAt        DateTime         @updatedAt
+  gameResults      GameResult[]
+  chatbotHistories ChatbotHistory[]
+  dailyFact        DailyFact?       @relation("DailyFactUsers", fields: [factId], references: [id])
+  factId           String?
+}
+
+model GameResult {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  gameType  String
+  score     Int
+  createdAt DateTime @default(now())
+}
+
+model ChatbotHistory {
+  id        String   @id @default(uuid())
+  user      User     @relation(fields: [userId], references: [id])
+  userId    String
+  message   String
+  timestamp DateTime @default(now())
+}
+
+model DailyFact {
+  id        String   @id @default(uuid())
+  fact      String
+  createdAt DateTime @default(now())
+  users     User[]   @relation("DailyFactUsers")
+}
